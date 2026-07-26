@@ -1,0 +1,44 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const links = await getCollection("links");
+
+const categories = new Map<
+  string,
+  { title: string; url: string; description: string }[]
+>();
+
+for (const link of links) {
+  const cat = link.data.category;
+  if (!categories.has(cat)) {
+    categories.set(cat, []);
+  }
+  categories.get(cat)!.push({
+    title: link.data.title,
+    url: link.data.url,
+    description: link.data.description,
+  });
+}
+
+const sortedCategories = [...categories.entries()].sort((a, b) =>
+  a[0].localeCompare(b[0])
+);
+---
+
+<Layout title="Home">
+  <h1 class="page-title">Categories</h1>
+  <div class="categories">
+    {
+      sortedCategories.map(([category, items]) => (
+        <a
+          href={`/category/${category.toLowerCase().replace(/\s+/g, "-")}`}
+          class="category-card"
+        >
+          <h2>{category}</h2>
+          <span class="count">{items.length} link{items.length !== 1 ? "s" : ""}</span>
+        </a>
+      ))
+    }
+  </div>
+</Layout>
