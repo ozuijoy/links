@@ -1,0 +1,42 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+interface Params {
+  slug: string;
+}
+
+export async function getStaticPaths() {
+  const links = await getCollection("links");
+  const categories = [...new Set(links.map((l) => l.data.category))];
+  return categories.map((cat) => ({
+    params: { slug: cat.toLowerCase().replace(/\s+/g, "-") },
+    props: { category: cat },
+  }));
+}
+
+const { category } = Astro.props as { category: string };
+const links = await getCollection("links");
+const categoryLinks = links
+  .filter((l) => l.data.category === category)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title));
+---
+
+<Layout title={category}>
+  <a href="/" class="back-link">&larr; All Categories</a>
+  <h1 class="page-title">{category}</h1>
+  <div class="links">
+    {
+      categoryLinks.map((link) => (
+        <a href={link.data.url} class="link-card" target="_blank" rel="noopener noreferrer">
+          <div class="link-icon">{link.data.title[0]}</div>
+          <div class="link-info">
+            <div class="link-title">{link.data.title}</div>
+            <div class="link-url">{new URL(link.data.url).hostname}</div>
+            <div class="link-desc">{link.data.description}</div>
+          </div>
+        </a>
+      ))
+    }
+  </div>
+</Layout>
