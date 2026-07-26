@@ -2,8 +2,6 @@
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 
-const base = import.meta.env.BASE_URL;
-
 const links = await getCollection("links");
 
 const categories = new Map<
@@ -29,18 +27,49 @@ const sortedCategories = [...categories.entries()].sort((a, b) =>
 ---
 
 <Layout title="Home">
-  <h1 class="page-title">Categories</h1>
-  <div class="categories">
-    {
-      sortedCategories.map(([category, items]) => (
-        <a
-          href={`${base}category/${category.toLowerCase().replace(/\s+/g, "-")}`}
-          class="category-card"
-        >
-          <h2>{category}</h2>
-          <span class="count">{items.length} link{items.length !== 1 ? "s" : ""}</span>
-        </a>
-      ))
-    }
-  </div>
+  <section class="hero">
+    <h1>Site Links</h1>
+    <p>A curated collection of useful websites for developers</p>
+  </section>
+
+  {
+    sortedCategories.map(([category, items], i) => (
+      <section class="category-section">
+        <h2 class="category-heading">
+          <span class="category-dot"></span>
+          {category}
+          <span class="category-count">{items.length}</span>
+        </h2>
+        <div class="link-grid">
+          {items.map((item) => (
+            <a
+              href={item.url}
+              class="link-card"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="link-favicon">
+                <img
+                  src={`https://www.google.com/s2/favicons?domain=${new URL(item.url).hostname}&sz=32`}
+                  alt=""
+                  width="16"
+                  height="16"
+                  loading="lazy"
+                  onerror="this.style.display='none'"
+                />
+              </span>
+              <div class="link-body">
+                <span class="link-title">{item.title}</span>
+                <span class="link-desc">{item.description}</span>
+              </div>
+              <svg class="link-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="7" y1="17" x2="17" y2="7"/>
+                <polyline points="7 7 17 7 17 17"/>
+              </svg>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))
+  }
 </Layout>
