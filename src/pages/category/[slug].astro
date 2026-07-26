@@ -15,6 +15,8 @@ export async function getStaticPaths() {
   }));
 }
 
+const base = import.meta.env.BASE_URL;
+
 const { category } = Astro.props as { category: string };
 const links = await getCollection("links");
 const categoryLinks = links
@@ -23,7 +25,7 @@ const categoryLinks = links
 ---
 
 <Layout title={category}>
-  <a href="/" class="back-link">&larr; All Categories</a>
+  <a href={base} class="back-link">&larr; All Categories</a>
   <h1 class="page-title">{category}</h1>
   <div class="links">
     {
